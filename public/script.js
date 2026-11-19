@@ -63,22 +63,22 @@ calcBtn.addEventListener('click', async () => {
 });
 
 function renderHistory() {
-    historyBody. inneHTML = "";
-    const filter = document.getElementById('filter-catgory').value;
-    const search = document.getElementById('search-input').value.tolowerCase();
+    historyBody.innerHTML = "";
+    const filter = document.getElementById('filter-category').value;
+    const search = document.getElementById('search-input').value.toLowerCase();
     const filteredRecords = historyRecords.filter(record => {
         const matchesCategory = filter === 'all' || record.category === filter;
-        const matchesSearch = record.date.tolowerCase().includes(search) || record.revenue.toString().includes(search);
+        const matchesSearch = record.date.toLowerCase().includes(search) || record.revenue.toString().includes(search);
         return matchesCategory && matchesSearch;
     });
 
     filteredRecords.forEach(record => {
-        const row = document.creatElement('tr');
+        const row = document.createElement('tr');
         row.innerHTML = `
             <td>${record.date}</td>
             <td>${record.category}</td>
-            <td>${record.revenue.tolocaleString()} RWF</td>
-            <td>${record.vat.totaleString()} RWF</td>
+            <td>${record.revenue.toLocaleString()} RWF</td>
+            <td>${record.vat.toLocaleString()} RWF</td>
             <td>${record.foreign}</td>
         `;
     });
