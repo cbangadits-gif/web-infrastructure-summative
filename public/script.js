@@ -38,7 +38,7 @@ calcBtn.addEventListener('click', async () => {
     if (currency !== 'RWF' && exchangeRates) {
         const rate = exchangeRates[currency];
         if (rate) {
-            const foreignAmount = vatDueRwf * rate;
+            const foreignAmount = (vatDueRwf / exchangeRates['RWF']) * exchangeRates[currency];
             foreignEquivalentStr = `${foreignAmount.toFixed(2)} ${currency}`;
         }
     } else if (currency === 'RWF') {
