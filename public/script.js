@@ -39,7 +39,7 @@ calcBtn.addEventListener('click', async () => {
         const rate = exchangeRates[currency];
         if (rate) {
             const foreignAmount = vatDueRwf * rate;
-            foreignEquivalentStr = `${foreignAmount.toFixed(2)} $ {currency}`;
+            foreignEquivalentStr = `${foreignAmount.toFixed(2)} ${currency}`;
         }
     } else if (currency === 'RWF') {
         foreignEquivalentStr = `${vatDueRwf.toFixed(2)} RWF`;
@@ -81,6 +81,7 @@ function renderHistory() {
             <td>${record.vat.toLocaleString()} RWF</td>
             <td>${record.foreign}</td>
         `;
+        historyBody.appendChild(row);
     });
 }
 
