@@ -4,6 +4,7 @@ let exchangeRates = null;
 const amountInput = document.getElementById('amount');
 const categorySelect = document.getElementById('category');
 const currencySelect = document.getElementById('currency');
+const monthsLateInput = document.getElementById('months-late');
 const calcBtn = document.getElementById('calculate-btn');
 const errorDiv = document.getElementById('error-message');
 const resultDisplay = document.getElementById('result-display');
@@ -34,6 +35,9 @@ calcBtn.addEventListener('click', async () => {
     const taxRate = category === 'standard' ? 0.18 : 0;
     const vatDueRwf = amount * taxRate;
     
+    const monthsLate = parseInt(monthsLateInput.value) || 0;
+    const penaltyRwf = vatDueRwf * 0.03 * monthsLate;
+    const totalDueRwf = vatDueRwf + penaltyRwf;
     let foreignEquivalentStr = "N/A";
     if (currency !== 'RWF' && exchangeRates) {
         const rate = exchangeRates[currency];
@@ -43,6 +47,13 @@ calcBtn.addEventListener('click', async () => {
         }
     } else if (currency === 'RWF') {
         foreignEquivalentStr = `${vatDueRwf.toFixed(2)} RWF`;
+    }
+let penaltyHTML="";
+    if(monthsLate > 0) {
+        penaltyHTML=`
+        <p style="color: red;">Late penalty (${monthsLate} months): <strong>${penaltyRwf.toLocaleString()}RWF</strong></p>
+        <p>Total Due (VAT+ Penalty): <strong>${totalDueRwf.toLocaleString()}RWF</strong></p>
+        `;
     }
     resultDisplay.innerHTML = `
         <h3>Revenue: ${amount.toLocaleString()} RWF</h3>
@@ -56,6 +67,7 @@ calcBtn.addEventListener('click', async () => {
         category: category,
         revenue: amount,
         vat: vatDueRwf,
+        penalty: penaltyRwf,
         foreign: foreignEquivalentStr,
     };
     historyRecords.unshift(record);

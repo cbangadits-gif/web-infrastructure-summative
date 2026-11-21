@@ -31,9 +31,14 @@
                 <div class="input-group">
                     <label for="currency">Report in Currency:</label>
                     <select id="currency">
+                        <option value ="RWF">RWF (Rwandan franc)</option>
                         <option value ="USD">USD (US Dollar)</option>
                         <option value="EUR">EUR (Euro)</option>
                     </select>
+                </div>
+                <div class="input-group">
+                    <label for="months-late">Months Late (Optional - 3% penalty/month):</label>
+                    <input type ="number"id="months-late" placeholder="e.g 2" min="0" value="0">
                 </div>
                 <button id="calculate-btn">Calculate VAT</button>
                 <div id="error-message" class="error"></div>
