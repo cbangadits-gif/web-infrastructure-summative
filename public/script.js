@@ -18,41 +18,44 @@ async function fetchRates() {
         exchangeRates = data.rates; 
     } catch (error) {
         console.error("Could not fetch exchange rates:", error);
+        errorDiv.textContent = "Exchange rates are unavailable. Amounts in RWF still work.";
     }
 }
 fetchRates();
 
-calcBtn.addEventListener('click', async () => {
+calcBtn.addEventListener('click', () => {
     errorDiv.textContent = "";
     const amount = parseFloat(amountInput.value);
     const category = categorySelect.value;
     const currency = currencySelect.value;
+    const monthsLate = monthsLateInput.value === "" ? 0 : Number(monthsLateInput.value);
 
     if (isNaN(amount) || amount <= 0) {
         errorDiv.textContent = "Please enter a valid positive number for the amount.";
         return;
     }
+    if (!Number.isInteger(monthsLate) || monthsLate <0) {
+        errorDiv.textContent = "Months late must be a whole number (0 or more).";
+        return;
+    }
     const taxRate = category === 'standard' ? 0.18 : 0;
     const vatDueRwf = amount * taxRate;
-    
-    const monthsLate = parseInt(monthsLateInput.value) || 0;
     const penaltyRwf = vatDueRwf * 0.03 * monthsLate;
     const totalDueRwf = vatDueRwf + penaltyRwf;
     let foreignEquivalentStr = "N/A";
-    if (currency !== 'RWF' && exchangeRates) {
-        const rate = exchangeRates[currency];
-        if (rate) {
+    if (currency === 'RWF') {
+        foreignEquivalentStr = `${vatDueRwf.toFixed(2)} RWF`;
+    } else if (exchangeRates && exchangeRates[currency] && exchangeRates['RWF']) {
             const foreignAmount = (vatDueRwf / exchangeRates['RWF']) * exchangeRates[currency];
             foreignEquivalentStr = `${foreignAmount.toFixed(2)} ${currency}`;
-        }
-    } else if (currency === 'RWF') {
-        foreignEquivalentStr = `${vatDueRwf.toFixed(2)} RWF`;
+    } else {
+        errorDiv.textContent = "Exchange rate not available for " + currency + ".";
     }
 let penaltyHTML="";
     if(monthsLate > 0) {
         penaltyHTML=`
-        <p style="color: red;">Late penalty (${monthsLate} months): <strong>${penaltyRwf.toLocaleString()}RWF</strong></p>
-        <p>Total Due (VAT+ Penalty): <strong>${totalDueRwf.toLocaleString()}RWF</strong></p>
+        <p style="color: red;">Late penalty (${monthsLate} months): <strong>${penaltyRwf.toLocaleString()} RWF</strong></p>
+        <p>Total Due (VAT+ Penalty): <strong>${totalDueRwf.toLocaleString()} RWF</strong></p>
         `;
     }
     resultDisplay.innerHTML = `
@@ -61,6 +64,7 @@ let penaltyHTML="";
         <p>VAT Rate: <strong>${taxRate * 100}%</strong></p>
         <p>VAT Due: <strong>${vatDueRwf.toLocaleString()} RWF</strong></p>
         <p>Equivalent in ${currency}: <strong>${foreignEquivalentStr}</strong></p>
+        ${penaltyHTML} 
     `;
     const record ={
         date: new Date().toDateString(),
@@ -91,6 +95,7 @@ function renderHistory() {
             <td>${record.category}</td>
             <td>${record.revenue.toLocaleString()} RWF</td>
             <td>${record.vat.toLocaleString()} RWF</td>
+            <td>${record.penalty.toLocaleString()} RWF</td>
             <td>${record.foreign}</td>
         `;
         historyBody.appendChild(row);
